@@ -1,0 +1,727 @@
+<!DOCTYPE html>
+<html lang="en" class="h-full">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>AI Legal Assistant - Indian Law Information &amp; Research</title>
+  <!-- Tailwind CSS CDN -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <!-- Marked.js CDN for clean Markdown rendering of Gemini responses -->
+  <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&family=Cinzel:wght@600;700&display=swap" rel="stylesheet">
+  <script>
+    tailwind.config = {
+      darkMode: 'class',
+      theme: {
+        extend: {
+          fontFamily: {
+            sans: ['"Plus Jakarta Sans"', 'sans-serif'],
+            serif: ['Cinzel', 'serif']
+          },
+          colors: {
+            brand: {
+              slate: '#0f172a',
+              indigo: '#131c31',
+              cyan: '#06b6d4',
+              gold: '#f59e0b'
+            }
+          }
+        }
+      }
+    }
+  </script>
+  <style>
+    /* Architectural grid background */
+    .architectural-grid {
+      background-image: 
+        linear-gradient(to right, rgba(255, 255, 255, 0.025) 1px, transparent 1px),
+        linear-gradient(to bottom, rgba(255, 255, 255, 0.025) 1px, transparent 1px);
+      background-size: 36px 36px;
+    }
+
+    /* Subtle spotlight border & surface glow */
+    .spotlight-card {
+      position: relative;
+    }
+    .spotlight-card::before {
+      content: '';
+      position: absolute;
+      inset: 0;
+      border-radius: inherit;
+      padding: 1px;
+      background: radial-gradient(
+        450px circle at var(--mouse-x, -500px) var(--mouse-y, -500px),
+        rgba(99, 102, 241, 0.35),
+        rgba(56, 189, 248, 0.2) 30%,
+        transparent 65%
+      );
+      -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+      mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+      -webkit-mask-composite: xor;
+      mask-composite: exclude;
+      pointer-events: none;
+      transition: opacity 0.3s ease;
+      opacity: 0;
+    }
+    .spotlight-card:hover::before {
+      opacity: 1;
+    }
+    .spotlight-card::after {
+      content: '';
+      position: absolute;
+      inset: 0;
+      border-radius: inherit;
+      background: radial-gradient(
+        600px circle at var(--mouse-x, -500px) var(--mouse-y, -500px),
+        rgba(99, 102, 241, 0.04),
+        transparent 50%
+      );
+      pointer-events: none;
+      opacity: 0;
+      transition: opacity 0.3s ease;
+    }
+    .spotlight-card:hover::after {
+      opacity: 1;
+    }
+
+    /* Horizontal ticker marquee animation */
+    @keyframes marquee {
+      0% { transform: translateX(0%); }
+      100% { transform: translateX(-50%); }
+    }
+    .animate-marquee {
+      display: inline-flex;
+      white-space: nowrap;
+      animation: marquee 35s linear infinite;
+    }
+    .animate-marquee:hover {
+      animation-play-state: paused;
+    }
+
+    /* Markdown prose formatting */
+    .markdown-content {
+      line-height: 1.7;
+      color: #cbd5e1;
+    }
+    .markdown-content p { margin-bottom: 0.85rem; }
+    .markdown-content strong { color: #f8fafc; font-weight: 600; }
+    .markdown-content ul, .markdown-content ol { margin-left: 1.25rem; margin-bottom: 0.85rem; list-style-type: disc; }
+    .markdown-content li { margin-bottom: 0.35rem; }
+    .markdown-content blockquote {
+      border-left: 3px solid #6366f1;
+      padding-left: 0.85rem;
+      color: #e2e8f0;
+      font-style: italic;
+      background: rgba(99, 102, 241, 0.08);
+      padding: 0.65rem 0.85rem;
+      border-radius: 0 0.5rem 0.5rem 0;
+      margin: 1rem 0;
+    }
+    .markdown-content code {
+      background: rgba(255, 255, 255, 0.08);
+      padding: 0.15rem 0.4rem;
+      border-radius: 0.25rem;
+      font-size: 0.88em;
+      color: #7dd3fc;
+    }
+  </style>
+</head>
+<body class="bg-gradient-to-b from-[#0f172a] via-[#11192e] to-[#131c31] text-slate-200 min-h-full flex flex-col font-sans antialiased selection:bg-indigo-500/30 selection:text-indigo-200 architectural-grid">
+
+  <!-- ======================================================================== -->
+  <!-- 1. TOP FROSTED NAVIGATION BAR                                            -->
+  <!-- ======================================================================== -->
+  <header class="sticky top-0 z-50">
+    <nav class="bg-slate-900/60 backdrop-blur-xl border-b border-slate-700/60 px-4 sm:px-8 py-3.5 shadow-lg shadow-black/20">
+      <div class="max-w-7xl mx-auto flex flex-col sm:flex-row items-center justify-between gap-3">
+        
+        <!-- Brand Title & Legal Emblem -->
+        <div class="flex items-center gap-3">
+          <div class="w-9 h-9 rounded-xl bg-gradient-to-tr from-indigo-600 via-indigo-500 to-cyan-500 flex items-center justify-center shadow-md shadow-indigo-500/25 text-white font-bold text-lg border border-indigo-400/40">
+            ⚖️
+          </div>
+          <div>
+            <div class="flex items-center gap-2">
+              <span class="text-base sm:text-lg font-bold tracking-tight text-slate-100 font-serif">AI Legal Assistant</span>
+              <span class="text-[10px] uppercase tracking-wider font-semibold px-2 py-0.5 rounded-full bg-indigo-500/10 text-indigo-300 border border-indigo-500/30">Indian Law</span>
+            </div>
+            <p class="text-xs text-slate-400">Statutory Retrieval &amp; Plain-English Grounding</p>
+          </div>
+        </div>
+
+        <!-- View-Switching Navigation Tabs -->
+        <div class="flex items-center gap-1.5 p-1 rounded-xl bg-slate-950/40 border border-slate-800 text-xs font-medium">
+          <button id="tab-search" onclick="switchTab('search')" class="tab-btn px-3.5 py-1.5 rounded-lg bg-indigo-600 text-white font-semibold transition shadow-sm">
+            Search
+          </button>
+          <button id="tab-bns" onclick="switchTab('bns')" class="tab-btn px-3.5 py-1.5 rounded-lg text-slate-400 hover:text-slate-200 hover:bg-slate-800/60 transition">
+            BNS vs IPC Guide
+          </button>
+          <button id="tab-acts" onclick="switchTab('acts')" class="tab-btn px-3.5 py-1.5 rounded-lg text-slate-400 hover:text-slate-200 hover:bg-slate-800/60 transition">
+            Supported Acts
+          </button>
+          <button id="tab-about" onclick="switchTab('about')" class="tab-btn px-3.5 py-1.5 rounded-lg text-slate-400 hover:text-slate-200 hover:bg-slate-800/60 transition">
+            About
+          </button>
+        </div>
+
+      </div>
+    </nav>
+
+    <!-- ======================================================================== -->
+    <!-- 2. SLEEK HORIZONTAL DISCLAIMER & INDEX TICKER                            -->
+    <!-- ======================================================================== -->
+    <div class="bg-indigo-950/40 border-b border-indigo-500/20 py-2 px-4 overflow-hidden relative backdrop-blur-md">
+      <div class="animate-marquee flex items-center gap-12 text-xs font-medium text-slate-300">
+        <!-- Ticker Item 1 -->
+        <span class="inline-flex items-center gap-2">
+          <span class="w-2 h-2 rounded-full bg-amber-400"></span>
+          <strong class="text-amber-300">Disclaimer:</strong> Educational legal awareness tool under Indian Law — Not formal legal advice.
+        </span>
+        <span class="text-slate-600">•</span>
+        <!-- Ticker Item 2 -->
+        <span class="inline-flex items-center gap-2">
+          <span class="w-2 h-2 rounded-full bg-emerald-400"></span>
+          <span><strong>Statutory Index:</strong> 580+ Sections Indexed • Bharatiya Nyaya Sanhita (BNS 2023) • Indian Penal Code (IPC 1860) • Information Technology Act (IT Act 2000)</span>
+        </span>
+        <span class="text-slate-600">•</span>
+        <!-- Ticker Item 3 -->
+        <span class="inline-flex items-center gap-2">
+          <span class="w-2 h-2 rounded-full bg-cyan-400"></span>
+          <span><strong>Emergency Helplines:</strong> National Cyber Crime Portal (<strong>1930</strong>) • Emergency Services (<strong>112</strong>)</span>
+        </span>
+        <span class="text-slate-600">•</span>
+        <!-- Duplicate Sequence for Seamless Infinite Scroll -->
+        <span class="inline-flex items-center gap-2">
+          <span class="w-2 h-2 rounded-full bg-amber-400"></span>
+          <strong class="text-amber-300">Disclaimer:</strong> Educational legal awareness tool under Indian Law — Not formal legal advice.
+        </span>
+        <span class="text-slate-600">•</span>
+        <span class="inline-flex items-center gap-2">
+          <span class="w-2 h-2 rounded-full bg-emerald-400"></span>
+          <span><strong>Statutory Index:</strong> 580+ Sections Indexed • Bharatiya Nyaya Sanhita (BNS 2023) • Indian Penal Code (IPC 1860) • Information Technology Act (IT Act 2000)</span>
+        </span>
+        <span class="text-slate-600">•</span>
+        <span class="inline-flex items-center gap-2">
+          <span class="w-2 h-2 rounded-full bg-cyan-400"></span>
+          <span><strong>Emergency Helplines:</strong> National Cyber Crime Portal (<strong>1930</strong>) • Emergency Services (<strong>112</strong>)</span>
+        </span>
+      </div>
+    </div>
+  </header>
+
+  <!-- ======================================================================== -->
+  <!-- 3. MAIN CONTENT CONTAINER                                               -->
+  <!-- ======================================================================== -->
+  <main class="flex-1 max-w-5xl w-full mx-auto p-4 sm:p-6 lg:p-8 flex flex-col gap-6">
+
+    <!-- ====================================================================== -->
+    <!-- TAB 1: SEARCH & LEGAL RETRIEVAL INTERFACE (DEFAULT)                    -->
+    <!-- ====================================================================== -->
+    <div id="view-search" class="view-content flex flex-col gap-6">
+
+      <!-- Centered Hero Search Card with Mouse-Reactive Spotlight -->
+      <section class="spotlight-card bg-slate-900/50 backdrop-blur-xl rounded-2xl p-6 sm:p-8 border border-slate-700/60 shadow-xl relative overflow-hidden text-center">
+        
+        <div class="max-w-2xl mx-auto mb-6">
+          <h2 class="text-2xl sm:text-3xl font-extrabold text-slate-100 tracking-tight font-serif mb-2">
+            Search Indian Law
+          </h2>
+          <p class="text-sm text-slate-400 leading-relaxed">
+            Inquire in conversational language or search specific section numbers. The system matches statutory provisions across BNS 2023, IPC 1860, and IT Act 2000 with plain-English breakdowns.
+          </p>
+        </div>
+
+        <!-- Search Form -->
+        <form id="searchForm" onsubmit="handleQuerySubmit(event)" class="max-w-3xl mx-auto relative mb-4">
+          <div class="relative flex items-center shadow-lg rounded-xl overflow-hidden bg-slate-950/60 border border-slate-700/70 focus-within:border-indigo-500/80 focus-within:ring-2 focus-within:ring-indigo-500/20 transition-all duration-200">
+            <div class="absolute left-4 text-slate-400 pointer-events-none">
+              <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/>
+              </svg>
+            </div>
+            <input
+              type="text"
+              id="queryInput"
+              class="w-full pl-12 pr-28 py-4 bg-transparent text-slate-100 placeholder-slate-500 text-sm sm:text-base focus:outline-none"
+              placeholder="e.g. Someone stole my bike, UPI payment scam, Section 420, defamation..."
+              required
+              autocomplete="off"
+            />
+            <button
+              type="submit"
+              id="submitBtn"
+              class="absolute right-2 px-5 py-2.5 bg-gradient-to-r from-indigo-600 to-indigo-700 hover:from-indigo-500 hover:to-indigo-600 text-white text-xs sm:text-sm font-semibold rounded-lg shadow-md shadow-indigo-600/25 transition-all flex items-center gap-1.5 disabled:opacity-50"
+            >
+              <span>Search</span>
+              <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3"/>
+              </svg>
+            </button>
+          </div>
+        </form>
+
+        <!-- Quick Demo Prompt Pills -->
+        <div class="max-w-3xl mx-auto flex flex-wrap items-center justify-center gap-2 pt-1 text-xs">
+          <span class="text-slate-400 font-medium">Quick Prompts:</span>
+          <button type="button" onclick="setQueryPrompt('Someone cheated me with a fake UPI payment scam')" class="px-3 py-1.5 rounded-lg bg-slate-800/60 hover:bg-slate-700/70 text-slate-300 border border-slate-700/50 hover:border-indigo-500/40 transition">
+            💳 UPI Scam (IT 66D / BNS 318)
+          </button>
+          <button type="button" onclick="setQueryPrompt('My bike was stolen from the parking lot')" class="px-3 py-1.5 rounded-lg bg-slate-800/60 hover:bg-slate-700/70 text-slate-300 border border-slate-700/50 hover:border-indigo-500/40 transition">
+            🛵 Vehicle Theft (BNS 303 / IPC 379)
+          </button>
+          <button type="button" onclick="setQueryPrompt('Defamatory rumors spread about me on social media')" class="px-3 py-1.5 rounded-lg bg-slate-800/60 hover:bg-slate-700/70 text-slate-300 border border-slate-700/50 hover:border-indigo-500/40 transition">
+            📢 Defamation (BNS 356 / IPC 499)
+          </button>
+          <button type="button" onclick="setQueryPrompt('Hacking and unauthorized server database breach')" class="px-3 py-1.5 rounded-lg bg-slate-800/60 hover:bg-slate-700/70 text-slate-300 border border-slate-700/50 hover:border-indigo-500/40 transition">
+            💻 Cyber Hacking (IT Act 66)
+          </button>
+          <button type="button" onclick="setQueryPrompt('Section 420 punishment and BNS replacement')" class="px-3 py-1.5 rounded-lg bg-slate-800/60 hover:bg-slate-700/70 text-slate-300 border border-slate-700/50 hover:border-indigo-500/40 transition">
+            ⚖️ Section 420 &amp; BNS 318
+          </button>
+        </div>
+
+      </section>
+
+      <!-- Loading State Spinner -->
+      <div id="loadingIndicator" class="hidden flex-col items-center justify-center p-12 bg-slate-900/50 backdrop-blur-xl rounded-2xl border border-slate-700/60 text-center">
+        <div class="relative w-12 h-12">
+          <div class="w-12 h-12 rounded-full border-4 border-slate-700 border-t-indigo-500 animate-spin"></div>
+        </div>
+        <p class="mt-4 text-sm font-semibold text-slate-200" id="loadingStage">Querying statutory database &amp; analyzing scenario...</p>
+        <p class="text-xs text-slate-400 mt-1">Filtering BNS 2023, IPC transitions, and IT Act provisions</p>
+      </div>
+
+      <!-- Results Dashboard Container -->
+      <div id="resultsDashboard" class="hidden flex flex-col gap-6">
+
+        <!-- Plain-English Breakdown Card with Mouse Spotlight -->
+        <section class="spotlight-card bg-slate-900/50 backdrop-blur-xl rounded-2xl p-6 sm:p-7 border border-slate-700/60 shadow-xl relative overflow-hidden">
+          <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-4 mb-4 border-b border-slate-800">
+            <div class="flex items-center gap-3">
+              <div class="w-8 h-8 rounded-lg bg-indigo-500/20 border border-indigo-500/40 flex items-center justify-center text-indigo-300">
+                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"/>
+                </svg>
+              </div>
+              <div>
+                <h3 class="text-base sm:text-lg font-bold text-slate-100">Statutory Plain-English Breakdown</h3>
+                <p class="text-xs text-slate-400">Synthesized strictly from matched legal statutory provisions</p>
+              </div>
+            </div>
+            <div>
+              <span id="modelBadge" class="text-xs px-3 py-1 rounded-full bg-indigo-500/10 border border-indigo-500/30 text-indigo-300 font-medium">
+                AI Legal Engine
+              </span>
+            </div>
+          </div>
+
+          <!-- Rendered Markdown Container -->
+          <div id="geminiOutput" class="text-sm text-slate-300 markdown-content leading-[1.7] max-w-4xl">
+            <!-- Populated dynamically via JS -->
+          </div>
+
+          <div class="mt-6 pt-3.5 border-t border-slate-800/80 flex flex-col sm:flex-row sm:items-center justify-between gap-2 text-xs text-slate-400">
+            <span>National Cybercrime Helpline: <strong class="text-slate-200">1930</strong> (cybercrime.gov.in)</span>
+            <span>Emergency Services: <strong class="text-slate-200">112</strong></span>
+          </div>
+        </section>
+
+        <!-- Matched Statutory Sections Grid -->
+        <section>
+          <div class="mb-4">
+            <h3 class="text-base sm:text-lg font-bold text-slate-100 flex items-center gap-2">
+              <span>Retrieved Statutory Provisions</span>
+              <span class="text-xs px-2 py-0.5 rounded bg-slate-800 text-slate-300 border border-slate-700">Authoritative Law</span>
+            </h3>
+            <p class="text-xs text-slate-400">Ranked by exact word-boundary statutory matching</p>
+          </div>
+
+          <div id="sectionsGrid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+            <!-- Populated dynamically via JS -->
+          </div>
+        </section>
+
+      </div>
+
+      <!-- Welcome / Guide State -->
+      <div id="welcomeState" class="spotlight-card bg-slate-900/50 backdrop-blur-xl rounded-2xl p-6 sm:p-8 border border-slate-700/60 shadow-xl text-center">
+        <div class="w-14 h-14 rounded-2xl bg-indigo-500/10 border border-indigo-500/30 flex items-center justify-center text-2xl mx-auto mb-4">
+          📚
+        </div>
+        <h3 class="text-lg font-bold text-slate-100">How To Use AI Legal Assistant</h3>
+        <p class="text-sm text-slate-400 max-w-xl mx-auto mt-2 leading-[1.7]">
+          Describe an incident in natural language (e.g. online cheating, physical altercation, theft) or enter specific section numbers. The system matches the relevant statutes under <strong class="text-slate-200">BNS 2023</strong>, <strong class="text-slate-200">IPC 1860</strong>, and <strong class="text-slate-200">IT Act 2000</strong> with an educational plain-English analysis.
+        </p>
+
+        <div class="grid grid-cols-1 sm:grid-cols-3 gap-4 max-w-3xl mx-auto mt-6 text-left">
+          <div class="p-4 rounded-xl bg-slate-950/40 border border-slate-800">
+            <div class="text-indigo-400 text-sm font-semibold mb-1">1. Precise Retrieval</div>
+            <p class="text-xs text-slate-400 leading-relaxed">Indexed concordance across 580+ sections with word-boundary ranking.</p>
+          </div>
+          <div class="p-4 rounded-xl bg-slate-950/40 border border-slate-800">
+            <div class="text-indigo-400 text-sm font-semibold mb-1">2. BNS-IPC Concordance</div>
+            <p class="text-xs text-slate-400 leading-relaxed">Direct mapping between historical IPC laws and modern Bharatiya Nyaya Sanhita 2023.</p>
+          </div>
+          <div class="p-4 rounded-xl bg-slate-950/40 border border-slate-800">
+            <div class="text-indigo-400 text-sm font-semibold mb-1">3. Plain-English Summary</div>
+            <p class="text-xs text-slate-400 leading-relaxed">Translates complex legal statutory jargon into clear citizen rights and reporting steps.</p>
+          </div>
+        </div>
+      </div>
+
+    </div>
+
+    <!-- ====================================================================== -->
+    <!-- TAB 2: BNS VS IPC GUIDE (INLINE VIEW)                                   -->
+    <!-- ====================================================================== -->
+    <div id="view-bns" class="view-content hidden flex flex-col gap-6">
+      <div class="spotlight-card bg-slate-900/50 backdrop-blur-xl rounded-2xl p-6 sm:p-8 border border-slate-700/60 shadow-xl">
+        <h3 class="text-xl font-bold text-slate-100 font-serif mb-2">Bharatiya Nyaya Sanhita (BNS 2023) vs IPC 1860 Transition Guide</h3>
+        <p class="text-sm text-slate-400 leading-[1.7] mb-6">
+          On July 1, 2024, the Bharatiya Nyaya Sanhita (BNS 2023) came into effect in India, replacing the Indian Penal Code (IPC 1860). Below is a quick comparative reference of the most frequently cited criminal provisions:
+        </p>
+
+        <div class="overflow-x-auto rounded-xl border border-slate-800">
+          <table class="w-full text-left text-xs sm:text-sm text-slate-300">
+            <thead class="bg-slate-950/70 text-slate-400 uppercase text-[11px] font-semibold border-b border-slate-800">
+              <tr>
+                <th class="py-3 px-4">Offence / Subject Matter</th>
+                <th class="py-3 px-4 text-amber-300">Old Law (IPC 1860)</th>
+                <th class="py-3 px-4 text-emerald-300">New Law (BNS 2023)</th>
+                <th class="py-3 px-4">Key Changes / Punishment Note</th>
+              </tr>
+            </thead>
+            <tbody class="divide-y divide-slate-800/80 bg-slate-900/30">
+              <tr class="hover:bg-slate-800/30">
+                <td class="py-3 px-4 font-medium text-slate-200">Murder</td>
+                <td class="py-3 px-4 font-mono text-amber-300">Section 302</td>
+                <td class="py-3 px-4 font-mono text-emerald-300">Section 103(1)</td>
+                <td class="py-3 px-4 text-xs text-slate-400">Death or life imprisonment + fine. Section 103(2) introduces mob lynching provisions.</td>
+              </tr>
+              <tr class="hover:bg-slate-800/30">
+                <td class="py-3 px-4 font-medium text-slate-200">Attempt to Murder</td>
+                <td class="py-3 px-4 font-mono text-amber-300">Section 307</td>
+                <td class="py-3 px-4 font-mono text-emerald-300">Section 109</td>
+                <td class="py-3 px-4 text-xs text-slate-400">Imprisonment up to 10 years + fine; life imprisonment if hurt is caused.</td>
+              </tr>
+              <tr class="hover:bg-slate-800/30">
+                <td class="py-3 px-4 font-medium text-slate-200">Theft</td>
+                <td class="py-3 px-4 font-mono text-amber-300">Section 378 / 379</td>
+                <td class="py-3 px-4 font-mono text-emerald-300">Section 303(1) &amp; (2)</td>
+                <td class="py-3 px-4 text-xs text-slate-400">Community service introduced for petty theft under ₹5,000 upon return of property.</td>
+              </tr>
+              <tr class="hover:bg-slate-800/30">
+                <td class="py-3 px-4 font-medium text-slate-200">Cheating &amp; Fraud</td>
+                <td class="py-3 px-4 font-mono text-amber-300">Section 415 / 420</td>
+                <td class="py-3 px-4 font-mono text-emerald-300">Section 318(1) &amp; (4)</td>
+                <td class="py-3 px-4 text-xs text-slate-400">Imprisonment up to 7 years + fine for cheating and dishonestly inducing delivery of property.</td>
+              </tr>
+              <tr class="hover:bg-slate-800/30">
+                <td class="py-3 px-4 font-medium text-slate-200">Criminal Breach of Trust</td>
+                <td class="py-3 px-4 font-mono text-amber-300">Section 405 / 406</td>
+                <td class="py-3 px-4 font-mono text-emerald-300">Section 316</td>
+                <td class="py-3 px-4 text-xs text-slate-400">Imprisonment up to 5 years or fine, or both.</td>
+              </tr>
+              <tr class="hover:bg-slate-800/30">
+                <td class="py-3 px-4 font-medium text-slate-200">Rape &amp; Sexual Offences</td>
+                <td class="py-3 px-4 font-mono text-amber-300">Section 375 / 376</td>
+                <td class="py-3 px-4 font-mono text-emerald-300">Section 63 / 64</td>
+                <td class="py-3 px-4 text-xs text-slate-400">Rigorous imprisonment not less than 10 years extending to life. Section 69 penalizes deceitful promises to marry.</td>
+              </tr>
+              <tr class="hover:bg-slate-800/30">
+                <td class="py-3 px-4 font-medium text-slate-200">Cruelty by Husband / Relatives</td>
+                <td class="py-3 px-4 font-mono text-amber-300">Section 498A</td>
+                <td class="py-3 px-4 font-mono text-emerald-300">Section 85 &amp; 86</td>
+                <td class="py-3 px-4 text-xs text-slate-400">Imprisonment up to 3 years + fine. Cruelty definition retained and clarified.</td>
+              </tr>
+              <tr class="hover:bg-slate-800/30">
+                <td class="py-3 px-4 font-medium text-slate-200">Defamation</td>
+                <td class="py-3 px-4 font-mono text-amber-300">Section 499 / 500</td>
+                <td class="py-3 px-4 font-mono text-emerald-300">Section 356</td>
+                <td class="py-3 px-4 text-xs text-slate-400">Simple imprisonment up to 2 years, fine, or community service.</td>
+              </tr>
+              <tr class="hover:bg-slate-800/30">
+                <td class="py-3 px-4 font-medium text-slate-200">Criminal Intimidation</td>
+                <td class="py-3 px-4 font-mono text-amber-300">Section 503 / 506</td>
+                <td class="py-3 px-4 font-mono text-emerald-300">Section 351</td>
+                <td class="py-3 px-4 text-xs text-slate-400">Imprisonment up to 2 years or fine; up to 7 years if threat to cause death or grievous hurt.</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+    <!-- ====================================================================== -->
+    <!-- TAB 3: SUPPORTED ACTS (INLINE VIEW)                                     -->
+    <!-- ====================================================================== -->
+    <div id="view-acts" class="view-content hidden flex flex-col gap-6">
+      <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+        
+        <div class="spotlight-card bg-slate-900/50 backdrop-blur-xl rounded-2xl p-6 border border-slate-700/60 shadow-xl flex flex-col justify-between">
+          <div>
+            <span class="text-xs px-2.5 py-1 rounded-md bg-emerald-500/10 text-emerald-400 border border-emerald-500/30 font-medium">New Criminal Code</span>
+            <h4 class="text-lg font-bold text-slate-100 mt-3 mb-2 font-serif">Bharatiya Nyaya Sanhita, 2023</h4>
+            <p class="text-xs text-slate-300 leading-[1.7]">
+              The principal substantive criminal law of India replacing the IPC. Comprises 358 sections, introducing community service, organized crime penalties, cyber-crime coordination, and revised chapters.
+            </p>
+          </div>
+          <div class="mt-6 pt-4 border-t border-slate-800 text-[11px] text-slate-400">
+            Effective Date: <strong>July 1, 2024</strong>
+          </div>
+        </div>
+
+        <div class="spotlight-card bg-slate-900/50 backdrop-blur-xl rounded-2xl p-6 border border-slate-700/60 shadow-xl flex flex-col justify-between">
+          <div>
+            <span class="text-xs px-2.5 py-1 rounded-md bg-amber-500/10 text-amber-400 border border-amber-500/30 font-medium">Transitional &amp; Historical</span>
+            <h4 class="text-lg font-bold text-slate-100 mt-3 mb-2 font-serif">Indian Penal Code, 1860</h4>
+            <p class="text-xs text-slate-300 leading-[1.7]">
+              The historic 575-section criminal code. Essential for ongoing trials, prior offences committed before July 2024, and cross-reference research across judicial precedents.
+            </p>
+          </div>
+          <div class="mt-6 pt-4 border-t border-slate-800 text-[11px] text-slate-400">
+            Coverage: <strong>All 575 Sections Indexed</strong>
+          </div>
+        </div>
+
+        <div class="spotlight-card bg-slate-900/50 backdrop-blur-xl rounded-2xl p-6 border border-slate-700/60 shadow-xl flex flex-col justify-between">
+          <div>
+            <span class="text-xs px-2.5 py-1 rounded-md bg-cyan-500/10 text-cyan-400 border border-cyan-500/30 font-medium">Cyber Law &amp; Digital Crimes</span>
+            <h4 class="text-lg font-bold text-slate-100 mt-3 mb-2 font-serif">Information Technology Act, 2000</h4>
+            <p class="text-xs text-slate-300 leading-[1.7]">
+              Covers cyber security breaches, hacking (Sec 66), identity theft (Sec 66C), UPI personation and phishing fraud (Sec 66D), privacy violations (Sec 66E), and electronic obscenity (Sec 67).
+            </p>
+          </div>
+          <div class="mt-6 pt-4 border-t border-slate-800 text-[11px] text-slate-400">
+            Redressal: <strong>National Cyber Portal (1930)</strong>
+          </div>
+        </div>
+
+      </div>
+    </div>
+
+    <!-- ====================================================================== -->
+    <!-- TAB 4: ABOUT & METHODOLOGY (INLINE VIEW)                               -->
+    <!-- ====================================================================== -->
+    <div id="view-about" class="view-content hidden flex flex-col gap-6">
+      <div class="spotlight-card bg-slate-900/50 backdrop-blur-xl rounded-2xl p-6 sm:p-8 border border-slate-700/60 shadow-xl max-w-4xl mx-auto">
+        <h3 class="text-xl font-bold text-slate-100 font-serif mb-2">About AI Legal Assistant</h3>
+        <p class="text-sm text-slate-300 leading-[1.7] mb-4">
+          The <strong>AI Legal Assistant</strong> is an educational legal awareness engine built to help citizens, students, and legal researchers understand statutory Indian Law in plain, accessible English.
+        </p>
+        
+        <h4 class="text-base font-semibold text-slate-200 mt-6 mb-2">Core Architecture &amp; Pipeline:</h4>
+        <ul class="text-xs sm:text-sm text-slate-300 space-y-2 list-disc list-inside leading-[1.7]">
+          <li><strong>Statutory Ingestion:</strong> Dynamic caching of 580+ provisions from verified statutory datasets, including IPC, BNS mappings, and IT Act sections.</li>
+          <li><strong>Word-Boundary Retrieval:</strong> Sub-millisecond token matching that isolates relevant legal statutes with zero unrelated section padding.</li>
+          <li><strong>Grounded Language Model:</strong> Powered by Google's Gemini models with low-latency client configuration and an automatic multi-model fail-safe chain.</li>
+          <li><strong>Disk-Backed Cache:</strong> Instantaneous responses for previously queried situations with zero API overhead.</li>
+        </ul>
+
+        <div class="mt-6 p-4 rounded-xl bg-amber-500/10 border border-amber-500/30 text-xs text-amber-200 leading-[1.7]">
+          <strong>Notice:</strong> This application is intended solely for educational information and legal literacy. It does not establish an attorney-client relationship and should not replace advice from a qualified legal practitioner.
+        </div>
+      </div>
+    </div>
+
+  </main>
+
+  <!-- ======================================================================== -->
+  <!-- 4. FOOTER                                                               -->
+  <!-- ======================================================================== -->
+  <footer class="bg-slate-950/60 border-t border-slate-800 py-4 px-6 text-center text-xs text-slate-400 mt-auto backdrop-blur-md">
+    <p>AI Legal Assistant • Educational Legal Awareness under Indian Law (BNS 2023 • IPC 1860 • IT Act 2000)</p>
+  </footer>
+
+  <!-- ======================================================================== -->
+  <!-- 5. JAVASCRIPT LOGIC & SPOTLIGHT TRACKING                                -->
+  <!-- ======================================================================== -->
+  <script>
+    // Tab switching logic (inline sections without page reload)
+    function switchTab(tabName) {
+      document.querySelectorAll('.view-content').forEach(view => view.classList.add('hidden'));
+      document.querySelectorAll('.tab-btn').forEach(btn => {
+        btn.classList.remove('bg-indigo-600', 'text-white', 'font-semibold');
+        btn.classList.add('text-slate-400');
+      });
+
+      const selectedView = document.getElementById(`view-${tabName}`);
+      const selectedBtn = document.getElementById(`tab-${tabName}`);
+      if (selectedView) selectedView.classList.remove('hidden');
+      if (selectedBtn) {
+        selectedBtn.classList.add('bg-indigo-600', 'text-white', 'font-semibold');
+        selectedBtn.classList.remove('text-slate-400');
+      }
+    }
+
+    // Vanilla JS mousemove tracking for frosted glass spotlight effect
+    function initSpotlight(element) {
+      if (!element) return;
+      element.addEventListener('mousemove', e => {
+        const rect = element.getBoundingClientRect();
+        const x = e.clientX - rect.left;
+        const y = e.clientY - rect.top;
+        element.style.setProperty('--mouse-x', `${x}px`);
+        element.style.setProperty('--mouse-y', `${y}px`);
+      });
+    }
+
+    document.querySelectorAll('.spotlight-card').forEach(initSpotlight);
+
+    // Prompt pills helper
+    function setQueryPrompt(text) {
+      switchTab('search');
+      const input = document.getElementById('queryInput');
+      input.value = text;
+      input.focus();
+      handleQuerySubmit(new Event('submit'));
+    }
+
+    // Badge color helper
+    function getActBadgeColor(act) {
+      if (act.includes('Bharatiya Nyaya') || act.includes('BNS')) {
+        return 'bg-emerald-500/10 text-emerald-400 border-emerald-500/30';
+      } else if (act.includes('Information Technology') || act.includes('IT Act')) {
+        return 'bg-cyan-500/10 text-cyan-400 border-cyan-500/30';
+      } else {
+        return 'bg-amber-500/10 text-amber-400 border-amber-500/30';
+      }
+    }
+
+    // Backend query execution handler
+    async function handleQuerySubmit(event) {
+      if (event) event.preventDefault();
+      switchTab('search');
+
+      const queryInput = document.getElementById('queryInput');
+      const query = queryInput.value.trim();
+      if (!query) return;
+
+      const submitBtn = document.getElementById('submitBtn');
+      const loadingIndicator = document.getElementById('loadingIndicator');
+      const resultsDashboard = document.getElementById('resultsDashboard');
+      const welcomeState = document.getElementById('welcomeState');
+      const geminiOutput = document.getElementById('geminiOutput');
+      const sectionsGrid = document.getElementById('sectionsGrid');
+      const modelBadge = document.getElementById('modelBadge');
+
+      // Update UI to Loading State
+      submitBtn.disabled = true;
+      welcomeState.classList.add('hidden');
+      resultsDashboard.classList.add('hidden');
+      loadingIndicator.classList.remove('hidden');
+
+      try {
+        const response = await fetch('/api/query', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ query: query })
+        });
+
+        if (!response.ok) {
+          throw new Error(`Server returned HTTP ${response.status}`);
+        }
+
+        const data = await response.json();
+
+        // 1. Render Plain-English Breakdown via Markdown
+        modelBadge.textContent = data.source_model || 'AI Legal Engine';
+        if (window.marked && typeof marked.parse === 'function') {
+          geminiOutput.innerHTML = marked.parse(data.gemini_summary || 'No summary available.');
+        } else {
+          geminiOutput.innerText = data.gemini_summary || 'No summary available.';
+        }
+
+        // 2. Render Retrieved Statutory Sections Grid
+        sectionsGrid.innerHTML = '';
+        const sections = data.sections || [];
+
+        if (sections.length === 0) {
+          sectionsGrid.innerHTML = `
+            <div class="col-span-full p-6 text-center bg-slate-900/40 rounded-xl border border-slate-800 text-slate-400 text-xs">
+              No direct statutory sections matched the exact word boundaries of your query. Try broadening your keywords.
+            </div>
+          `;
+        }
+
+        sections.forEach((sec, idx) => {
+          const badgeClass = getActBadgeColor(sec.act || '');
+          const cardHtml = `
+            <div class="spotlight-card bg-slate-900/50 backdrop-blur-xl rounded-xl p-5 border border-slate-700/60 hover:border-slate-600/80 flex flex-col justify-between transition-all duration-200 shadow-lg relative group">
+              <div class="absolute -top-2.5 left-4">
+                <span class="text-[10px] font-bold px-2 py-0.5 rounded-full bg-slate-950 text-indigo-300 border border-indigo-500/30 shadow">
+                  Rank #${idx + 1}
+                </span>
+              </div>
+
+              <div>
+                <!-- Act Badge -->
+                <div class="mt-1.5 mb-2">
+                  <span class="text-[11px] font-medium px-2 py-0.5 rounded-md border ${badgeClass}">
+                    ${sec.act}
+                  </span>
+                </div>
+
+                <!-- Section & Title -->
+                <h4 class="text-base font-bold text-slate-100 mb-1">${sec.section}</h4>
+                <p class="text-xs font-semibold text-indigo-300 mb-2 leading-snug">${sec.title}</p>
+
+                <!-- Transition Mapping Badge -->
+                ${sec.ipc_bns_mapping ? `
+                  <div class="mb-3 px-2 py-1 rounded bg-slate-950/60 border border-slate-800 text-[11px] text-slate-300 flex items-center gap-1.5">
+                    <span class="text-slate-400 font-medium">Concordance:</span>
+                    <span class="text-slate-200">${sec.ipc_bns_mapping}</span>
+                  </div>
+                ` : ''}
+
+                <!-- Statutory Definition -->
+                <div class="mb-3">
+                  <span class="text-[10px] uppercase font-bold text-slate-400 tracking-wider">Statutory Definition:</span>
+                  <p class="text-xs text-slate-300 mt-1 leading-[1.65] bg-slate-950/50 p-2.5 rounded-lg border border-slate-800/80 max-h-36 overflow-y-auto">
+                    ${sec.description}
+                  </p>
+                </div>
+              </div>
+
+              <!-- Punishment & Classification -->
+              <div class="pt-3 border-t border-slate-800">
+                <span class="text-[10px] uppercase font-bold text-rose-400 tracking-wider flex items-center gap-1">
+                  <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"/></svg>
+                  Prescribed Punishment:
+                </span>
+                <p class="text-xs text-rose-200 mt-1 bg-rose-950/20 p-2 rounded-lg border border-rose-900/30 font-medium leading-relaxed">
+                  ${sec.punishment}
+                </p>
+              </div>
+            </div>
+          `;
+          sectionsGrid.insertAdjacentHTML('beforeend', cardHtml);
+        });
+
+        // Attach mousemove spotlight tracking to freshly created section cards
+        sectionsGrid.querySelectorAll('.spotlight-card').forEach(initSpotlight);
+
+        // Reveal Results
+        loadingIndicator.classList.add('hidden');
+        resultsDashboard.classList.remove('hidden');
+
+      } catch (err) {
+        console.error('Query execution error:', err);
+        loadingIndicator.classList.add('hidden');
+        resultsDashboard.classList.remove('hidden');
+        geminiOutput.innerHTML = `
+          <div class="p-4 bg-rose-950/40 border border-rose-800/50 rounded-xl text-rose-200 text-xs leading-relaxed">
+            <strong>System Notification:</strong> Unable to process query via network (${err.message}).
+            Please ensure the Flask backend is active on <code>http://127.0.0.1:5000</code>.
+          </div>
+        `;
+      } finally {
+        submitBtn.disabled = false;
+      }
+    }
+  </script>
+</body>
+</html>
